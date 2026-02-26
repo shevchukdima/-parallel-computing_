@@ -75,24 +75,50 @@ void parallel(Matrix& matrix, int N, int num_threads)
 
 int main()
 {
-    int N = 2000;
+    vector<int> sizes = {1000, 3000, 6000};   // різні розміри матриці
+    vector<int> threads_to_test = {3, 6, 12, 24, 48, 96, 192};
 
-    Matrix matrix(N, vector<int>(N));
+    cout << "Size\tThreads\tTime(ms)\n";
 
-    fillMatrix(matrix, N);
+    for (int N : sizes)
+    {
+        Matrix matrix(N, vector<int>(N));
+        fillMatrix(matrix, N);
 
-    
-    auto start = chrono::high_resolution_clock::now();
+        // ---------- SEQUENTIAL ----------
+        {
+            Matrix copy = matrix;
 
-    sequential(matrix, N);
+            auto start = chrono::high_resolution_clock::now();
+            sequential(copy, N);
+            auto end = chrono::high_resolution_clock::now();
 
-    auto end = chrono::high_resolution_clock::now();
+            auto duration =
+                chrono::duration_cast<chrono::milliseconds>(end - start);
 
-    auto duration =
-        chrono::duration_cast<chrono::milliseconds>(end - start);
+            cout << N << "\t1\t"
+                 << duration.count() << endl;
+        }
 
-    cout << "Sequential time: "
-         << duration.count() << " ms\n";
+        // ---------- PARALLEL ----------
+        for (int t : threads_to_test)
+        {
+            Matrix copy = matrix;
+
+            auto start = chrono::high_resolution_clock::now();
+            parallel(copy, N, t);
+            auto end = chrono::high_resolution_clock::now();
+
+            auto duration =
+                chrono::duration_cast<chrono::milliseconds>(end - start);
+
+            cout << N << "\t"
+                 << t << "\t"
+                 << duration.count() << endl;
+        }
+
+        cout << endl;
+    }
 
     return 0;
 }
