@@ -19,7 +19,7 @@ void fillMatrix(Matrix& matrix, int N)
             matrix[i][j] = dist(gen);
 }
 
-void sequentail(Matrix& matrix, int N)
+void sequential(Matrix& matrix, int N)
 {
     for (int j = 0; j < N; j++)
     {
@@ -73,13 +73,26 @@ void parallel(Matrix& matrix, int N, int num_threads)
         th.join();
 }
 
-
-
 int main()
 {
     int N = 2000;
 
+    Matrix matrix(N, vector<int>(N));
 
+    fillMatrix(matrix, N);
 
+    
+    auto start = chrono::high_resolution_clock::now();
 
+    sequential(matrix, N);
+
+    auto end = chrono::high_resolution_clock::now();
+
+    auto duration =
+        chrono::duration_cast<chrono::milliseconds>(end - start);
+
+    cout << "Sequential time: "
+         << duration.count() << " ms\n";
+
+    return 0;
 }
