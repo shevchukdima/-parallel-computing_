@@ -75,7 +75,7 @@ void parallel(Matrix& matrix, int N, int num_threads)
 
 int main()
 {
-    vector<int> sizes = {1000, 3000, 6000};   // різні розміри матриці
+    vector<int> sizes = {1000, 3000, 6000};   
     vector<int> threads_to_test = {3, 6, 12, 24, 48, 96, 192};
 
     cout << "Size\tThreads\tTime(ms)\n";
@@ -85,7 +85,7 @@ int main()
         Matrix matrix(N, vector<int>(N));
         fillMatrix(matrix, N);
 
-        // ---------- SEQUENTIAL ----------
+        
         {
             Matrix copy = matrix;
 
@@ -100,7 +100,7 @@ int main()
                  << duration.count() << endl;
         }
 
-        // ---------- PARALLEL ----------
+        
         for (int t : threads_to_test)
         {
             Matrix copy = matrix;
