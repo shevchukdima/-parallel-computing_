@@ -20,6 +20,17 @@ void fillArray(vector<int>& data)
         v = dist(gen);
 }
 
+void sequential(const vector<int>& data, int& result)
+{
+    result = 0;
+
+    for(int v : data)
+        if(v % 15 == 0)
+            result ^= v;
+}
+
+
+
 
 int main()
 {
