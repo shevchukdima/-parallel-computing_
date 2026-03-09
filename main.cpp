@@ -44,6 +44,34 @@ void workerMutex(int start,int end,
     result ^= local;
 }
 
+void parallelMutex(const vector<int>& data,
+                   int& result,
+                   int numThreads)
+{
+    result = 0;
+
+    mutex mtx;
+    vector<thread> threads;
+
+    int chunk = data.size()/numThreads;
+
+    for(int t=0;t<numThreads;t++)
+    {
+        int start = t*chunk;
+        int end = (t==numThreads-1) ? data.size() : start+chunk;
+
+        threads.emplace_back(workerMutex,
+                             start,end,
+                             cref(data),
+                             ref(result),
+                             ref(mtx));
+    }
+
+    for(auto& th:threads)
+        th.join();
+}
+
+
 
 int main()
 {
