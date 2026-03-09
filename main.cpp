@@ -70,6 +70,52 @@ void parallelMutex(const vector<int>& data,
     for(auto& th:threads)
         th.join();
 }
+void workerCAS(int start,int end,
+               const vector<int>& data,
+               atomic<int>& result)
+{
+    int local = 0;
+
+    for(int i=start;i<end;i++)
+        if(data[i] % 15 == 0)
+            local ^= data[i];
+
+    int old = result.load();
+    int desired;
+
+    do
+    {
+        desired = old ^ local;
+    }
+    while(!result.compare_exchange_weak(old,desired));
+}
+
+void parallelCAS(const vector<int>& data,
+                 int& result,
+                 int numThreads)
+{
+    atomic<int> atomicResult(0);
+
+    vector<thread> threads;
+
+    int chunk = data.size()/numThreads;
+
+    for(int t=0;t<numThreads;t++)
+    {
+        int start = t*chunk;
+        int end = (t==numThreads-1) ? data.size() : start+chunk;
+
+        threads.emplace_back(workerCAS,
+                             start,end,
+                             cref(data),
+                             ref(atomicResult));
+    }
+
+    for(auto& th:threads)
+        th.join();
+
+    result = atomicResult.load();
+}
 
 
 
