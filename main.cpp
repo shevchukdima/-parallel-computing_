@@ -118,9 +118,45 @@ void parallelCAS(const vector<int>& data,
 }
 
 
-
 int main()
 {
+ vector<int> sizes = {10000,1000000,10000000};
+    int threads = 8;
 
+    cout<<"Size\tMode\tTime(ms)\n";
+
+    for(int N : sizes)
+    {
+        vector<int> data(N);
+        fillArray(data);
+
+        int result;
+
+        auto start = Clock::now();
+        sequential(data,result);
+        auto end = Clock::now();
+
+        cout<<N<<"\tSequential\t"
+            <<chrono::duration_cast<chrono::milliseconds>(end-start).count()
+            <<endl;
+
+        start = Clock::now();
+        parallelMutex(data,result,threads);
+        end = Clock::now();
+
+        cout<<N<<"\tMutex\t"
+            <<chrono::duration_cast<chrono::milliseconds>(end-start).count()
+            <<endl;
+
+        start = Clock::now();
+        parallelCAS(data,result,threads);
+        end = Clock::now();
+
+        cout<<N<<"\tCAS\t"
+            <<chrono::duration_cast<chrono::milliseconds>(end-start).count()
+            <<endl;
+
+        cout<<endl;
+    }
   return 0;
 }
