@@ -29,7 +29,20 @@ void sequential(const vector<int>& data, int& result)
             result ^= v;
 }
 
+void workerMutex(int start,int end,
+                 const vector<int>& data,
+                 int& result,
+                 mutex& mtx)
+{
+    int local = 0;
 
+    for(int i=start;i<end;i++)
+        if(data[i] % 15 == 0)
+            local ^= data[i];
+
+    lock_guard<mutex> lock(mtx);
+    result ^= local;
+}
 
 
 int main()
